@@ -1,0 +1,10 @@
+product1, https://github.com/test/test/
+product2, https://github.com/test/test
+product3, https://github.com/test/
+product4, https://github.com/test
+product5, https://github.com
+product6, http://github.com/test/test, param3
+product7, https://github.com/test/ , param3
+product8, HTTP://github.com/test,  param/3
+product9, https://github.com///
+
