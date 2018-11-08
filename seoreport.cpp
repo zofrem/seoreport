@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <vector>
 using namespace std;
 
@@ -39,10 +40,7 @@ bool isLastSlash(const string& url)
 {
   auto pos = url.find_last_of('/');
   ++pos;
-  if((url.length()) == pos)
-    return true;
-  else
-    return false;
+  return(url.length() == pos);
 }
 
 bool isInvalid(const string& line)
@@ -51,9 +49,7 @@ bool isInvalid(const string& line)
   size_t beginUrl = findUrlBegin(line);
   string fromUrl;
   if(string::npos != beginUrl)
-  {
     fromUrl = line.substr(beginUrl);
-  }
   else
     return true;
   
@@ -75,28 +71,48 @@ bool isInvalid(const string& line)
   return ret;
 }
 
-int main () {
-  vector<string> lines;
-  ifstream infile ("export.csv");
-  if (infile.is_open())
+vector<string> explode(string const & s, const char delim)
+{
+  vector<std::string> result;
+  istringstream iss(s);
+  for(string token; getline(iss, token, delim); )
   {
+    result.push_back(token);
+  }
+  return result;
+}
+
+int main (int argc, char *argv[]) {
+  vector<string> lines;
+  string filename(argv[1]);
+  ifstream infile (filename);
+  if(infile.is_open())
+  {
+    std::vector<std::string> splitName = explode(filename, '.');
     string line;
-    while ( getline (infile,line) )
+    while(getline (infile,line) )
     {
       lines.push_back(line);
     }
     infile.close();
     ofstream outfile;
-    outfile.open ("report.txt");
+    stringstream exportFile;
+    exportFile << splitName[0] << "_report." << splitName[1];
+    outfile.open(exportFile.str());
+    unsigned int invalidCount = 0;
     for(string const& value : lines)
     {
       if(isInvalid(value))
+      {
         outfile << value << endl;
+	++invalidCount;
+      }
     }
     outfile.close();
+    cout << "From all: " << lines.size() << " was invalid: " << invalidCount << endl;
   }
 
-  else cout << "Unable to open file"; 
+  else cout << "Unable to open file: " << filename << endl;
 
   return 0;
 }
